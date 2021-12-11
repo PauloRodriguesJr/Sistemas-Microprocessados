@@ -1,0 +1,1823 @@
+[
+    {
+        "id": "92d6683b.d82e38",
+        "type": "tab",
+        "label": "Painel_4LED_inc_Mode",
+        "disabled": false,
+        "info": "# Basic flow to start with STM32CubeMonitor."
+    },
+    {
+        "id": "8381c865.236028",
+        "type": "subflow",
+        "name": "Single value",
+        "info": "The 'single value' subflow allows to extract data from processing node.\r\n\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on : [Node-Red](https://nodered.org/docs/user-guide/editor/workspace/subflows)\r\n\r\n\r\n-------\r\n\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "3c5ffe0d.9063b2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "66397fd3.d8111",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-filter",
+                    "label": {
+                        "en-US": "Variable"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "color": "#3CB4E6"
+    },
+    {
+        "id": "505d983f.8ca5b8",
+        "type": "subflow",
+        "name": "Single value (2)",
+        "info": "The 'single value' subflow allows to :\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on [Node-Red][nr]\r\n[nr]: https://nodered.org/docs/user-guide/editor/workspace/subflows\r\n\r\n\r\n-------\r\n\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "898fdef.0ac292"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "71beb99f.54ca38",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "fe19cbb0.835108",
+        "type": "subflow",
+        "name": "Single value (6)",
+        "info": "The 'single value' subflow allows to :\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on [Node-Red][nr]\r\n[nr]: https://nodered.org/docs/user-guide/editor/workspace/subflows\r\n\r\n\r\n-------\r\n\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "f8ba0c73.3519b"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "d577e60e.e18bb8",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "color": "#DDAA99"
+    },
+    {
+        "id": "f5488610.26f538",
+        "type": "probe",
+        "probeid": "341A18000A14304D434D4E00",
+        "probename": "ST-Link v2 (...D4E00)",
+        "protocol": "SWD",
+        "frequency": "1.8 MHz - Default",
+        "probeproperty": "{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}",
+        "probeversion": "ST Link firmware version V2.J37",
+        "connectionType": "p2p"
+    },
+    {
+        "id": "260a00d9.25ca4",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "2985e7ea.bc59f8",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "863d1c5.1e9e7e",
+        "order": 1,
+        "disp": true,
+        "width": "17",
+        "collapse": false
+    },
+    {
+        "id": "de2b9c7b.a4893",
+        "type": "exe-config",
+        "name": "projeto_final",
+        "exefile": "C:\\Users\\Paulo\\Desktop\\Projects\\ST_projs\\projeto_final\\Debug\\projeto_final.elf",
+        "exefolder": "C:\\Users\\Paulo\\Desktop\\Projects\\ST_projs\\projeto_final\\Debug",
+        "exevariablelist": [
+            {
+                "address": "0x08002a60",
+                "name": "AHBPrescTable[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20000058",
+                "name": "clear_status",
+                "type": 5
+            },
+            {
+                "address": "0x20000084",
+                "name": "htim4.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x200000aa",
+                "name": "htim4.ChannelNState[0]",
+                "type": 2
+            },
+            {
+                "address": "0x200000a6",
+                "name": "htim4.ChannelState[0]",
+                "type": 2
+            },
+            {
+                "address": "0x200000ae",
+                "name": "htim4.DMABurstState",
+                "type": 2
+            },
+            {
+                "address": "0x20000088",
+                "name": "htim4.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20000080",
+                "name": "htim4.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x20000078",
+                "name": "htim4.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x20000070",
+                "name": "htim4.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x20000074",
+                "name": "htim4.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x2000006c",
+                "name": "htim4.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000007c",
+                "name": "htim4.Init.RepetitionCounter",
+                "type": 5
+            },
+            {
+                "address": "0x20000068",
+                "name": "htim4.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x200000a4",
+                "name": "htim4.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x200000a5",
+                "name": "htim4.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000003c",
+                "name": "lpa1",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000040",
+                "name": "lpa2",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000044",
+                "name": "lpa3",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x200000b0",
+                "name": "mn_dt_PWM",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000028",
+                "name": "mn_led1",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000002c",
+                "name": "mn_led2",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000030",
+                "name": "mn_led3",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000034",
+                "name": "mn_led4",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000038",
+                "name": "mn_tin_CRON",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x200000b4",
+                "name": "modo_oper",
+                "type": 5
+            },
+            {
+                "address": "0x20000054",
+                "name": "start_status",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x20000000",
+                "name": "SystemCoreClock",
+                "type": 5
+            },
+            {
+                "address": "0x200000b8",
+                "name": "uwTick",
+                "type": 5
+            },
+            {
+                "address": "0x20000008",
+                "name": "uwTickFreq",
+                "type": 2
+            },
+            {
+                "address": "0x20000004",
+                "name": "uwTickPrio",
+                "type": 5
+            }
+        ],
+        "expand": false,
+        "filename": "projeto_final.elf",
+        "exeModifiedTime": 1638643538757,
+        "configLastUpdate": 1638643722090
+    },
+    {
+        "id": "863d1c5.1e9e7e",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "bfbcf31e.16e06",
+        "type": "ui_spacer",
+        "z": "92d6683b.d82e38",
+        "name": "spacer",
+        "group": "2985e7ea.bc59f8",
+        "order": 6,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "9dde685f.780de8",
+        "type": "ui_spacer",
+        "z": "92d6683b.d82e38",
+        "name": "spacer",
+        "group": "2985e7ea.bc59f8",
+        "order": 11,
+        "width": 4,
+        "height": 1
+    },
+    {
+        "id": "5130eae7.539074",
+        "type": "ui_spacer",
+        "z": "92d6683b.d82e38",
+        "name": "spacer",
+        "group": "2985e7ea.bc59f8",
+        "order": 16,
+        "width": 4,
+        "height": 1
+    },
+    {
+        "id": "10dd19b9.571da6",
+        "type": "ui_spacer",
+        "z": "92d6683b.d82e38",
+        "name": "spacer",
+        "group": "2985e7ea.bc59f8",
+        "order": 17,
+        "width": 4,
+        "height": 1
+    },
+    {
+        "id": "3c5ffe0d.9063b2",
+        "type": "switch",
+        "z": "8381c865.236028",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "4e5ba7a5.14dec8"
+            ]
+        ]
+    },
+    {
+        "id": "4e5ba7a5.14dec8",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 60,
+        "wires": [
+            [
+                "42bc6ed.5b20d9"
+            ]
+        ]
+    },
+    {
+        "id": "42bc6ed.5b20d9",
+        "type": "split",
+        "z": "8381c865.236028",
+        "name": "Split a table[1..n] of duplets in n msg of single duplet",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            [
+                "8b8ddb84.6fb208"
+            ]
+        ]
+    },
+    {
+        "id": "8b8ddb84.6fb208",
+        "type": "delay",
+        "z": "8381c865.236028",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 200,
+        "y": 140,
+        "wires": [
+            [
+                "66397fd3.d8111"
+            ]
+        ]
+    },
+    {
+        "id": "66397fd3.d8111",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "898fdef.0ac292",
+        "type": "switch",
+        "z": "505d983f.8ca5b8",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "306dd6ba.732a0a"
+            ]
+        ]
+    },
+    {
+        "id": "306dd6ba.732a0a",
+        "type": "change",
+        "z": "505d983f.8ca5b8",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 60,
+        "wires": [
+            [
+                "fa786385.2030e"
+            ]
+        ]
+    },
+    {
+        "id": "fa786385.2030e",
+        "type": "split",
+        "z": "505d983f.8ca5b8",
+        "name": "Split a table[1..n] of duplets in n msg of single duplet",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            [
+                "44a5c11e.1b7c6"
+            ]
+        ]
+    },
+    {
+        "id": "44a5c11e.1b7c6",
+        "type": "delay",
+        "z": "505d983f.8ca5b8",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 200,
+        "y": 140,
+        "wires": [
+            [
+                "71beb99f.54ca38"
+            ]
+        ]
+    },
+    {
+        "id": "71beb99f.54ca38",
+        "type": "change",
+        "z": "505d983f.8ca5b8",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f8ba0c73.3519b",
+        "type": "switch",
+        "z": "fe19cbb0.835108",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "1637f0dc.3abf7f"
+            ]
+        ]
+    },
+    {
+        "id": "1637f0dc.3abf7f",
+        "type": "change",
+        "z": "fe19cbb0.835108",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 60,
+        "wires": [
+            [
+                "5f09dd63.a9a334"
+            ]
+        ]
+    },
+    {
+        "id": "5f09dd63.a9a334",
+        "type": "split",
+        "z": "fe19cbb0.835108",
+        "name": "Split a table[1..n] of duplets in n msg of single duplet",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            [
+                "8d25d388.aa8fa"
+            ]
+        ]
+    },
+    {
+        "id": "8d25d388.aa8fa",
+        "type": "delay",
+        "z": "fe19cbb0.835108",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 200,
+        "y": 140,
+        "wires": [
+            [
+                "d577e60e.e18bb8"
+            ]
+        ]
+    },
+    {
+        "id": "d577e60e.e18bb8",
+        "type": "change",
+        "z": "fe19cbb0.835108",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d3adca0d.fe4f48",
+        "type": "acquisition out",
+        "z": "92d6683b.d82e38",
+        "name": "myProbe_Out",
+        "probeconfig": "f5488610.26f538",
+        "x": 740,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2ed857dd.57c498",
+        "type": "acquisition in",
+        "z": "92d6683b.d82e38",
+        "name": "myProbe_In",
+        "probeconfig": "f5488610.26f538",
+        "x": 110,
+        "y": 440,
+        "wires": [
+            [
+                "b4f61115.f0871",
+                "c356de8d.a9005"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4bef816d.e8d49",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "group": "2985e7ea.bc59f8",
+        "order": 3,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Limpar Gráfico",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "clear",
+        "topicType": "str",
+        "x": 540,
+        "y": 980,
+        "wires": [
+            [
+                "3116a6f9.76f48a"
+            ]
+        ]
+    },
+    {
+        "id": "42b8f64f.db6be8",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "group": "2985e7ea.bc59f8",
+        "order": 1,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "INICIAR aquisição",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "start",
+        "topicType": "str",
+        "x": 110,
+        "y": 40,
+        "wires": [
+            [
+                "6070df56.5c221"
+            ]
+        ]
+    },
+    {
+        "id": "bbdafb65.5f36f8",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "group": "2985e7ea.bc59f8",
+        "order": 2,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "label": "PARAR Aquisição",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "stop",
+        "topicType": "str",
+        "x": 110,
+        "y": 120,
+        "wires": [
+            [
+                "6070df56.5c221"
+            ]
+        ]
+    },
+    {
+        "id": "697d9920.d65388",
+        "type": "ui_led",
+        "z": "92d6683b.d82e38",
+        "order": 10,
+        "group": "2985e7ea.bc59f8",
+        "width": 2,
+        "height": 1,
+        "label": "LED 4 ",
+        "labelPlacement": "left",
+        "labelAlignment": "center",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#000000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "Default",
+        "x": 880,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "6df69b7f.352a44",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_led4",
+                "type": "str"
+            }
+        ],
+        "x": 550,
+        "y": 400,
+        "wires": [
+            [
+                "ccafab90.7ca778"
+            ]
+        ]
+    },
+    {
+        "id": "ccafab90.7ca778",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload >0",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 400,
+        "wires": [
+            [
+                "697d9920.d65388"
+            ]
+        ]
+    },
+    {
+        "id": "ffeb32bd.64ba6",
+        "type": "ui_led",
+        "z": "92d6683b.d82e38",
+        "order": 8,
+        "group": "2985e7ea.bc59f8",
+        "width": 2,
+        "height": 1,
+        "label": "LED 3",
+        "labelPlacement": "left",
+        "labelAlignment": "center",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#000000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "Default",
+        "x": 880,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "fc2b339e.e33b2",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_led3",
+                "type": "str"
+            }
+        ],
+        "x": 550,
+        "y": 460,
+        "wires": [
+            [
+                "2375f842.487b78"
+            ]
+        ]
+    },
+    {
+        "id": "2375f842.487b78",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload >0",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 460,
+        "wires": [
+            [
+                "ffeb32bd.64ba6"
+            ]
+        ]
+    },
+    {
+        "id": "a9e60eed.c76f1",
+        "type": "ui_led",
+        "z": "92d6683b.d82e38",
+        "order": 7,
+        "group": "2985e7ea.bc59f8",
+        "width": 2,
+        "height": 1,
+        "label": "LED 2",
+        "labelPlacement": "left",
+        "labelAlignment": "center",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#000000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "Default",
+        "x": 880,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "6089d3d4.d4365c",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_led2",
+                "type": "str"
+            }
+        ],
+        "x": 550,
+        "y": 520,
+        "wires": [
+            [
+                "af766ccc.84344"
+            ]
+        ]
+    },
+    {
+        "id": "af766ccc.84344",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload >0",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 520,
+        "wires": [
+            [
+                "a9e60eed.c76f1"
+            ]
+        ]
+    },
+    {
+        "id": "43761319.d0218c",
+        "type": "ui_led",
+        "z": "92d6683b.d82e38",
+        "order": 9,
+        "group": "2985e7ea.bc59f8",
+        "width": 2,
+        "height": 1,
+        "label": "LED 1",
+        "labelPlacement": "left",
+        "labelAlignment": "center",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#000000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "Default",
+        "x": 880,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "c7902457.58caf8",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_led1",
+                "type": "str"
+            }
+        ],
+        "x": 550,
+        "y": 580,
+        "wires": [
+            [
+                "f9b494fa.ac0f48"
+            ]
+        ]
+    },
+    {
+        "id": "f9b494fa.ac0f48",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload >0",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 580,
+        "wires": [
+            [
+                "43761319.d0218c"
+            ]
+        ]
+    },
+    {
+        "id": "b4f61115.f0871",
+        "type": "processing",
+        "z": "92d6683b.d82e38",
+        "groupname": "myVars",
+        "groupid": "6070df56.5c221",
+        "expressions": [
+            {
+                "index": "11",
+                "formula": "mn_led4*20+75",
+                "name": "desloc_PB12"
+            },
+            {
+                "index": "12",
+                "formula": "mn_led3*20+50",
+                "name": "desloc_PB13"
+            },
+            {
+                "index": "13",
+                "formula": "mn_led2*20+25",
+                "name": "desloc_PB14"
+            },
+            {
+                "index": "14",
+                "formula": "mn_led1*20",
+                "name": "desloc_PB15"
+            },
+            {
+                "index": "15",
+                "formula": "lpa1*30",
+                "name": "desloc_PA1"
+            },
+            {
+                "index": "16",
+                "formula": "lpa2*50",
+                "name": "desloc_PA2"
+            },
+            {
+                "index": "17",
+                "formula": "lpa1*50",
+                "name": "desloc_PA3"
+            }
+        ],
+        "statistics": [],
+        "logmode": "full",
+        "logformat": "csv",
+        "x": 300,
+        "y": 880,
+        "wires": [
+            [
+                "9f82df8.6660f2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3116a6f9.76f48a",
+        "type": "ui_chartst",
+        "z": "92d6683b.d82e38",
+        "group": "2985e7ea.bc59f8",
+        "name": "osc",
+        "order": 12,
+        "width": 13,
+        "height": 9,
+        "chartType": "line",
+        "curveType": "linear",
+        "duration": "10",
+        "ymin": "",
+        "ymax": "",
+        "x": 715,
+        "y": 900,
+        "wires": [],
+        "l": false
+    },
+    {
+        "id": "c356de8d.a9005",
+        "type": "processing",
+        "z": "92d6683b.d82e38",
+        "groupname": "myVars",
+        "groupid": "6070df56.5c221",
+        "expressions": [
+            {
+                "index": "11",
+                "formula": "mn_tin_CRON/1000",
+                "name": "mn_tin_CRON_s"
+            },
+            {
+                "index": "12",
+                "formula": "lpa1",
+                "name": "lpa2"
+            },
+            {
+                "index": "13",
+                "formula": "lpa1",
+                "name": "lpa3"
+            }
+        ],
+        "statistics": [],
+        "logmode": "no",
+        "logformat": "csv",
+        "x": 320,
+        "y": 400,
+        "wires": [
+            [
+                "6df69b7f.352a44",
+                "fc2b339e.e33b2",
+                "6089d3d4.d4365c",
+                "c7902457.58caf8",
+                "50dd087.096b4f8",
+                "7d93dad3.cb27f4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9f82df8.6660f2",
+        "type": "switch",
+        "z": "92d6683b.d82e38",
+        "name": "filtra_desloc",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "desloc_PB12",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PB13",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PB14",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PB15",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PA1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PA2",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "desloc_PA3",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 7,
+        "x": 530,
+        "y": 900,
+        "wires": [
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ],
+            [
+                "3116a6f9.76f48a"
+            ]
+        ]
+    },
+    {
+        "id": "6070df56.5c221",
+        "type": "variables",
+        "z": "92d6683b.d82e38",
+        "groupname": "myVars",
+        "accesspoint": 0,
+        "execonfig": "de2b9c7b.a4893",
+        "variablelist": [],
+        "triggerstartmode": "manual",
+        "triggername": "lpa1",
+        "triggerthreshold": "30000",
+        "frequency": "",
+        "frequencyType": "0",
+        "snapshotheader": "",
+        "mode": "direct",
+        "lastImportedTime": 1638643722422,
+        "openStatus": true,
+        "x": 320,
+        "y": 80,
+        "wires": [
+            [
+                "d3adca0d.fe4f48"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8188e7d0.7eba68",
+        "type": "template",
+        "z": "92d6683b.d82e38",
+        "name": "write_msg",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n  \"variablelist\":\n  [\n    {\n      \"name\": \"lpa1\",\n      \"address\": \"0x2000003c\",\n      \"type\": 4,\n      \"value\": \"{{payload}}\"\n    }\n  ],\n  \"accesspoint\": 0\n}\n",
+        "output": "json",
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "e54eaa09.8875f8"
+            ]
+        ]
+    },
+    {
+        "id": "e54eaa09.8875f8",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "write",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 140,
+        "wires": [
+            [
+                "d3adca0d.fe4f48",
+                "97eabbd1.1f64f8"
+            ]
+        ]
+    },
+    {
+        "id": "9aff89fc.d8ed68",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "IRQ",
+        "group": "2985e7ea.bc59f8",
+        "order": 5,
+        "width": 4,
+        "height": 2,
+        "passthru": true,
+        "label": "Muda Modo",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "darkgreen",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 90,
+        "y": 220,
+        "wires": [
+            [
+                "8188e7d0.7eba68"
+            ]
+        ]
+    },
+    {
+        "id": "97eabbd1.1f64f8",
+        "type": "debug",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "573092b4.f41bcc",
+        "type": "ui_digital_display",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "group": "2985e7ea.bc59f8",
+        "order": 13,
+        "width": 4,
+        "height": 2,
+        "digits": "8",
+        "decimals": "2",
+        "x": 740,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "113a5da4.aeef12",
+        "type": "ui_gauge",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "group": "2985e7ea.bc59f8",
+        "order": 4,
+        "width": 5,
+        "height": 3,
+        "gtype": "gage",
+        "title": "PWM Gauge",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "200",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 730,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "50dd087.096b4f8",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_dt_PWM",
+                "type": "str"
+            }
+        ],
+        "x": 540,
+        "y": 640,
+        "wires": [
+            [
+                "113a5da4.aeef12"
+            ]
+        ]
+    },
+    {
+        "id": "7d93dad3.cb27f4",
+        "type": "subflow:505d983f.8ca5b8",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "mn_tin_CRON_s",
+                "type": "str"
+            }
+        ],
+        "x": 540,
+        "y": 700,
+        "wires": [
+            [
+                "573092b4.f41bcc"
+            ]
+        ]
+    },
+    {
+        "id": "a6aab174.9c5ce",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "Start/Stop Cron",
+        "group": "2985e7ea.bc59f8",
+        "order": 14,
+        "width": 4,
+        "height": 2,
+        "passthru": true,
+        "label": "Inicia/Pause Cronômetro",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "darkgreen",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "b8f28339.2c23a"
+            ]
+        ]
+    },
+    {
+        "id": "b8f28339.2c23a",
+        "type": "template",
+        "z": "92d6683b.d82e38",
+        "name": "write_msg",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n  \"variablelist\":\n  [\n    {\n      \"name\": \"lpa2\",\n      \"address\": \"0x20000040\",\n      \"type\": 4,\n      \"value\": \"{{payload}}\"\n    }\n  ],\n  \"accesspoint\": 0\n}\n",
+        "output": "json",
+        "x": 330,
+        "y": 260,
+        "wires": [
+            [
+                "34877656.8a0eba"
+            ]
+        ]
+    },
+    {
+        "id": "34877656.8a0eba",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "write",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 220,
+        "wires": [
+            [
+                "15658b33.0b0b45",
+                "d3adca0d.fe4f48"
+            ]
+        ]
+    },
+    {
+        "id": "15658b33.0b0b45",
+        "type": "debug",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "94ed4b6a.8a60a8",
+        "type": "ui_button",
+        "z": "92d6683b.d82e38",
+        "name": "Clear Cron",
+        "group": "2985e7ea.bc59f8",
+        "order": 15,
+        "width": 4,
+        "height": 2,
+        "passthru": true,
+        "label": "Limpa Cronômetro",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "darkgreen",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 110,
+        "y": 380,
+        "wires": [
+            [
+                "b9bd915.1b1777"
+            ]
+        ]
+    },
+    {
+        "id": "b9bd915.1b1777",
+        "type": "template",
+        "z": "92d6683b.d82e38",
+        "name": "write_msg",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n  \"variablelist\":\n  [\n    {\n      \"name\": \"clear_signal\",\n      \"address\": \"0x20000044\",\n      \"type\": 4,\n      \"value\": \"{{payload}}\"\n    }\n  ],\n  \"accesspoint\": 0\n}\n",
+        "output": "json",
+        "x": 330,
+        "y": 340,
+        "wires": [
+            [
+                "b1b7685d.d1b3c8"
+            ]
+        ]
+    },
+    {
+        "id": "b1b7685d.d1b3c8",
+        "type": "change",
+        "z": "92d6683b.d82e38",
+        "name": "set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "write",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 300,
+        "wires": [
+            [
+                "6a44b1a1.6676f",
+                "d3adca0d.fe4f48"
+            ]
+        ]
+    },
+    {
+        "id": "6a44b1a1.6676f",
+        "type": "debug",
+        "z": "92d6683b.d82e38",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 340,
+        "wires": []
+    }
+]
