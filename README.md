@@ -26,3 +26,8 @@ D) Um TIMER apresentado em TEXT/7-SEG e cronômetro crescente, com resolução d
    
 ## Resultados
 
+A animação abaixo apresenta as funcionalidades implementadas em um dashboard NodeRED, utilizando o software CubeMonitor.
+
+<p align="center">
+<img src="docs/project_demonstration.gif" width="600"/>
+</p>
